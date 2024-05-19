@@ -39,6 +39,16 @@ class _TimeTablePage extends State<TimeTablePage> {
 
   List<CalendarData> data = [];
 
+  void action(response){
+    final List<dynamic> responseData = json.decode(response.body);
+    setState(() {
+      data.clear();
+      responseData.forEach((json) {
+        data.add(CalendarData.fromJson(json));
+      });
+    });
+  }
+
   Future<void> getApi() async {
     prefs = await SharedPreferences.getInstance();
     id = prefs.getInt("id")!;
@@ -46,23 +56,11 @@ class _TimeTablePage extends State<TimeTablePage> {
     final apiUrl = '$mainURL/api/timetable/show?id=$id&day=${today.toString().substring(0, 10)}';
     final Map<String, String> header = CommonMethod.createHeader(jwt);
     final response = await http.get(Uri.parse(apiUrl), headers: header);
+    await CommonMethod.handleGet(response, action, context, apiUrl);
 
-    print("get api is running");
-    if (response.statusCode == 401) {
-      print("error");
-      // sent refresh token to get new access token
-    }
-    if (response.statusCode == 200) {
-print(response.body);
-      final List<dynamic> responseData = json.decode(response.body);
-      setState(() {
 
-        data.clear();
-        responseData.forEach((json) {
-          data.add(CalendarData.fromJson(json));
-        });
-      });
-    }
+
+
   }
 
   Future<void> _onDaySelected(DateTime day, DateTime focusedDay) async {
