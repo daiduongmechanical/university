@@ -1,6 +1,7 @@
 
 import 'package:flutter/material.dart';
 
+import '../shared/shared.dart';
 import 'custom_appbar.dart';
 import 'custom_drawer.dart';
 
@@ -17,6 +18,7 @@ final GlobalKey<ScaffoldState> scaffloldKey= GlobalKey<ScaffoldState>();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: BackgroundColor,
       key:scaffloldKey ,
       appBar: header(context, text: headText, scaffoldKey: scaffloldKey),
       body: child,

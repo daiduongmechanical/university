@@ -2,6 +2,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
+import 'package:university/shared/shared.dart';
 
 import '../data_type/KeyType.dart';
 
@@ -26,18 +27,18 @@ class InfoTag extends StatelessWidget {
       padding: const EdgeInsets.only(left: 15, right: 15),
       child: Container(
         decoration: BoxDecoration(
-          border: Border.all(width: 1, color: Colors.black87),
+          border: Border.all(width: 1, color: MainColor),
           borderRadius: BorderRadius.circular(8),
           color: Colors.white,
           boxShadow: [
             BoxShadow(
               color: Colors.grey,
-              blurRadius: 2,
-              offset: Offset(2, 4), // Shadow position
+              blurRadius: 3,
+              offset: Offset(3, 3), // Shadow position
             ),
           ],
         ),
-        margin: EdgeInsets.only(bottom: 15),
+        margin: EdgeInsets.only(bottom: 10),
         padding: EdgeInsets.all(10),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -88,7 +89,7 @@ class InfoTag extends StatelessWidget {
                   );
                 },
                 iconSize: 40,
-                color: Colors.red,
+                color: MainColor,
                 icon: icon!,
               ),
             if (icon != null && status != null)

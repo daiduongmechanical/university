@@ -12,10 +12,12 @@ AppBar header(
     backgroundColor: MainColor,
     title: Text(
       text,
+
       style: const TextStyle(
         fontSize: 22,
+
         fontWeight: FontWeight.bold,
-        color: Colors.black,
+        color: Colors.white,
       ),
     ),
     centerTitle: true,
@@ -23,7 +25,7 @@ AppBar header(
       icon: const Icon(
         Icons.arrow_back_ios_outlined,
         size: 26,
-        color: Colors.black,
+        color: Colors.white,
       ),
       onPressed: () {
         if (Navigator.of(context).canPop()) {
@@ -36,7 +38,7 @@ AppBar header(
         icon: const Icon(
           Icons.menu,
           size: 26,
-          color: Colors.black,
+          color: Colors.white,
         ),
         onPressed: () {
           scaffoldKey.currentState?.openEndDrawer();

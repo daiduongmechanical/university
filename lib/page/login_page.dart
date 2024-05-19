@@ -1,7 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:university/model/login_data.dart';
 
 import '../component/custom_filled_button.dart';
 import '../component/custom_text_field.dart';
@@ -40,11 +43,11 @@ class _loginPageState extends State<LoginPage> {
                       width: 150, height: 150),
                 ),
               ),
-      InputCustom(
-        hintText: 'Enter student code',
-        labelText: 'Student code',
-        controller: nameController,
-      ),
+              InputCustom(
+                hintText: 'Enter student code',
+                labelText: 'Student code',
+                controller: nameController,
+              ),
               InputCustom(
                 hintText: 'Enter password',
                 labelText: 'Password',
@@ -52,9 +55,8 @@ class _loginPageState extends State<LoginPage> {
                 isPassword: true,
                 notNull: true,
               ),
-          
               Padding(
-                padding: const EdgeInsets.only(bottom: 10,top: 20),
+                padding: const EdgeInsets.only(bottom: 10, top: 20),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -98,7 +100,7 @@ class _loginPageState extends State<LoginPage> {
               ),
               CustomFilledButton(
                 text: 'Login',
-                onTap: test,
+                onTap: _handleTap,
               )
             ],
           ),
@@ -109,7 +111,6 @@ class _loginPageState extends State<LoginPage> {
 
   void test() {
     if (_formKey.currentState!.validate()) {
-
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Processing Data')),
       );
@@ -120,14 +121,21 @@ class _loginPageState extends State<LoginPage> {
     String useUrl = '$mainURL/api/login';
     var url = Uri.parse(useUrl);
     Map<String, String> headers = {"Content-type": "application/json"};
-    String json = '{"email":"teacher", "password" :"1"}';
-    var response = await http.post(url, headers: headers, body: json);
+    String jsonSourec =
+        '{"email":"${nameController.text}", "password" :"${passController.text}"}';
+    var response = await http.post(url, headers: headers, body: jsonSourec);
     print('Response status: ${response.statusCode}');
     if (response.statusCode == 200) {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
-      prefs.setString("jwt", response.body);
-      print(response.body);
-      prefs.setInt("id", 5);
+
+      var jsonData = json.decode(response.body);
+      LoginData data = LoginData.fromJson(jsonData);
+      prefs.setInt("id", data.userId!);
+      prefs.setString("jwt", data.token!.accessToken!);
+      prefs.setString("refreshToken", data.token!.refeshToken!);
+
+      Navigator.push(context,
+          PageTransition(type: PageTransitionType.fade, child:HomePage()));
     }
   }
 }

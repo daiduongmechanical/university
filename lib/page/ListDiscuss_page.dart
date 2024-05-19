@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:ffi';
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -10,6 +11,7 @@ import '../component/info_tag.dart';
 import '../data_type/KeyType.dart';
 import '../layout/normal_layout.dart';
 import '../model/DiscussRoomDto.dart';
+import '../shared/common.dart';
 import '../shared/shared.dart';
 import 'discuss_page.dart';
 
@@ -21,36 +23,33 @@ class ListDiscussPage extends StatelessWidget {
   late SharedPreferences prefs;
   late final String jwt;
 
-  Future<List<DiscussRoomDto>> getApiData() async {
-    prefs = await SharedPreferences.getInstance();
-    String useUrl = '$mainURL/api/discuss/list/$id';
-    print(useUrl);
-    String jwt = prefs.getString("jwt")!;
-    Map<String, String> headers = {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-      'Authorization': 'Bearer ' + jwt,
-    };
-    var url = Uri.parse(useUrl);
-
-    var response = await http.get(url, headers: headers);
-    print(response.statusCode);
-    print(response.body);
-    if (response.statusCode == 200) {
-      data.clear();
-      final List<dynamic> responseData = json.decode(response.body);
-      responseData.forEach((json) {
-        data.add(DiscussRoomDto.fromJson(json));
-      });
-
-      return data;
-    } else {
-      throw Exception('Failed to load data');
-    }
+  void action(response){
+    data.clear();
+    final List<dynamic> responseData = json.decode(response.body);
+    responseData.forEach((json) {
+      data.add(DiscussRoomDto.fromJson(json));
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+
+    Future<void> getApiData() async {
+      prefs = await SharedPreferences.getInstance();
+      String useUrl = '$mainURL/api/discuss/list/$id';
+      print(useUrl);
+      String jwt = prefs.getString("jwt")!;
+      Map<String, String> headers = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': 'Bearer ' + jwt,
+      };
+      var url = Uri.parse(useUrl);
+
+      var response = await http.get(url, headers: headers);
+      await CommonMethod.handleGet(response, action, context, url);
+    }
+
     return NormalLayout(
         headText: "List Discuss Room",
         child: Padding(

@@ -89,11 +89,14 @@ print(response.body);
           children: [
             Expanded(
               child: TableCalendar(
+                calendarStyle:CalendarStyle(
+                  markerSize: 25,
+                ) ,
                 firstDay: DateTime.utc(2010, 10, 16),
                 lastDay: DateTime.utc(2030, 3, 14),
                 focusedDay: today,
                 onDaySelected: _onDaySelected,
-                rowHeight: 32,
+                rowHeight: 35,
                 selectedDayPredicate: (day) => isSameDay(day, today),
                 headerStyle: HeaderStyle(
                   formatButtonVisible: false,

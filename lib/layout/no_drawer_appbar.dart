@@ -14,7 +14,7 @@ AppBar NoDrawerAppbar(
       style: const TextStyle(
         fontSize: 22,
         fontWeight: FontWeight.bold,
-        color: Colors.black,
+        color: Colors.white,
       ),
     ),
     centerTitle: true,
@@ -22,7 +22,7 @@ AppBar NoDrawerAppbar(
       icon: const Icon(
         Icons.arrow_back_ios_outlined,
         size: 26,
-        color: Colors.black,
+        color: Colors.white,
       ),
       onPressed: () {
         if (Navigator.of(context).canPop()) {
