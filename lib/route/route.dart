@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
-import 'package:university/page/discuss_page.dart';
-import 'package:university/page/list_class_attend_page.dart';
-import 'package:university/page/mark_report_page.dart';
+import 'package:university/page/discuss/discuss_page.dart';
+import 'package:university/page/discuss/list_class_attend_page.dart';
+import 'package:university/page/mark/mark_report_page.dart';
 import 'package:university/page/time_table_page.dart';
 import 'package:university/page/RegisterSubject/subject_register_page.dart';
 import 'package:university/page/homepage.dart';
+
+import '../page/process/process_attend_page.dart';
 
 Route<dynamic>? generateRoute(RouteSettings settings) {
   switch (settings.name) {
@@ -36,6 +38,12 @@ Route<dynamic>? generateRoute(RouteSettings settings) {
     case '/home':
       return PageTransition(
         child: HomePage(),
+        type: PageTransitionType.rightToLeft,
+        settings: settings,
+      );
+    case '/process':
+      return PageTransition(
+        child: ProcessAttendPage(),
         type: PageTransitionType.rightToLeft,
         settings: settings,
       );

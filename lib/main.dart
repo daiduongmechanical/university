@@ -2,12 +2,12 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:university/page/RegisterSubject/subject_register_page.dart';
-import 'package:university/page/discuss_page.dart';
+import 'package:university/page/discuss/discuss_page.dart';
 import 'package:university/page/first_page.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:university/page/list_class_attend_page.dart';
-import 'package:university/page/mark_report_page.dart';
+import 'package:university/page/discuss/list_class_attend_page.dart';
+import 'package:university/page/mark/mark_report_page.dart';
 import 'package:university/page/time_table_page.dart';
 import 'package:university/route/route.dart';
 

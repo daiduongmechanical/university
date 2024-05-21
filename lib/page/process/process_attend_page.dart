@@ -3,21 +3,19 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:loading_animation_widget/loading_animation_widget.dart';
-import 'package:page_transition/page_transition.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:university/page/login_page.dart';
+import 'package:university/page/process/process_detail_page.dart';
 
-import '../component/info_tag.dart';
-import '../component/toLogin.dart';
-import '../data_type/KeyType.dart';
-import '../layout/normal_layout.dart';
-import '../model/ListClassDto.dart';
-import '../shared/common.dart';
-import '../shared/shared.dart';
-import 'ListDiscuss_page.dart';
+import '../../component/info_tag.dart';
+import '../../data_type/KeyType.dart';
+import '../../layout/normal_layout.dart';
+import '../../model/ListClassDto.dart';
+import '../../shared/common.dart';
+import '../../shared/shared.dart';
+import '../discuss/ListDiscuss_page.dart';
 
-class ListClassAttend extends StatelessWidget {
-  ListClassAttend({Key? key}) : super(key: key); // Modified
+class ProcessAttendPage extends StatelessWidget {
+  ProcessAttendPage({Key? key}) : super(key: key); // Modified
 
   late SharedPreferences prefs;
   late String jwt;
@@ -30,8 +28,8 @@ class ListClassAttend extends StatelessWidget {
     final List<dynamic> responseData = json.decode(response.body);
     responseData.forEach((json) {
       data.add(ListClassDto.fromJson(json));
-  });
-        }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +42,7 @@ class ListClassAttend extends StatelessWidget {
 
       var url = Uri.parse(useUrl);
       var response = await http.get(url, headers: CommonMethod.createHeader(jwt));
-     await CommonMethod.handleGet(response, action, context, url);
+      await CommonMethod.handleGet(response, action, context, url);
     }
 
     return NormalLayout(
@@ -75,7 +73,7 @@ class ListClassAttend extends StatelessWidget {
                       KeyValue(key: "Teacher", value: data[index].teacherName!)
                     ],
                     icon: Icon(Icons.navigate_next),
-                    page: ListDiscussPage(id: data[index].id!), // Modified
+                    page: ProcessDetailPage(classId: data[index].id!,), // Modified
                   ),
                 );
               },

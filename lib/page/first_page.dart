@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 import '../shared/shared.dart';
-import 'login_page.dart';
+import 'account/login_page.dart';
 
 class FirstPage extends StatelessWidget {
   @override

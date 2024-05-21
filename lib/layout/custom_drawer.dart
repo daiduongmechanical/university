@@ -5,6 +5,7 @@ import 'package:page_transition/page_transition.dart';
 
 import '../data_type/drawer_data.dart';
 
+import '../page/account/profile_page.dart';
 import '../shared/shared.dart';
 
 class CustomDrawer extends StatelessWidget {
@@ -16,6 +17,9 @@ class CustomDrawer extends StatelessWidget {
         page: "/register"),
     DrawerData(
         name: "Discuss", icon: Icon(Icons.chat_bubble), page: "/discuss"),
+
+    DrawerData(
+        name: "View process", icon: Icon(Icons.list), page: "/process"),
     DrawerData(
         name: 'Time table',
         icon: const Icon(Icons.calendar_month),
@@ -42,7 +46,12 @@ class CustomDrawer extends StatelessWidget {
       child: Column(
         children: [
           GestureDetector(
-            onTap: () {},
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => ProfilePage()),
+              );
+            },
             child: SizedBox(
               height: 220,
               child: DrawerHeader(

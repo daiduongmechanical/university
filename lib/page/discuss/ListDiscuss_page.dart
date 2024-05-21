@@ -7,12 +7,12 @@ import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
-import '../component/info_tag.dart';
-import '../data_type/KeyType.dart';
-import '../layout/normal_layout.dart';
-import '../model/DiscussRoomDto.dart';
-import '../shared/common.dart';
-import '../shared/shared.dart';
+import '../../component/info_tag.dart';
+import '../../data_type/KeyType.dart';
+import '../../layout/normal_layout.dart';
+import '../../model/DiscussRoomDto.dart';
+import '../../shared/common.dart';
+import '../../shared/shared.dart';
 import 'discuss_page.dart';
 
 class ListDiscussPage extends StatelessWidget {

@@ -7,12 +7,13 @@ import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
 import 'package:page_transition/page_transition.dart';
 
-import '../component/custom_select.dart';
-import '../data_type/select_time_data.dart';
-import '../layout/normal_layout.dart';
-import '../model/mark.dart';
-import '../shared/shared.dart';
+import '../../component/custom_select.dart';
+import '../../data_type/select_time_data.dart';
+import '../../layout/normal_layout.dart';
+import '../../model/mark.dart';
+import '../../shared/shared.dart';
 import 'detail_mark_page.dart';
+
 
 class MarkReportPage extends StatefulWidget {
   @override

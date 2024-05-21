@@ -1,17 +1,19 @@
 import 'dart:convert';
 
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:university/model/login_data.dart';
 
-import '../component/custom_filled_button.dart';
-import '../component/custom_text_field.dart';
-import '../component/input_custom.dart';
-import '../layout/no_drawer_layout.dart';
-import '../shared/shared.dart';
-import 'homepage.dart';
+import '../../component/custom_filled_button.dart';
+import '../../component/custom_text_field.dart';
+import '../../component/input_custom.dart';
+import '../../layout/no_drawer_layout.dart';
+import '../../shared/shared.dart';
+import '../homepage.dart';
+import 'forgot_password.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -20,12 +22,21 @@ class LoginPage extends StatefulWidget {
   }
 }
 
+
 class _loginPageState extends State<LoginPage> {
   bool checked = false;
   TextEditingController passController = TextEditingController();
   TextEditingController nameController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+
+  bool _obscureText = false;
+  void _toggle() {
+    setState(() {
+      _obscureText = !_obscureText;
+
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,16 +55,28 @@ class _loginPageState extends State<LoginPage> {
                 ),
               ),
               InputCustom(
-                hintText: 'Enter student code',
-                labelText: 'Student code',
+                hintText: 'Email',
+                labelText: 'Email',
                 controller: nameController,
-              ),
-              InputCustom(
-                hintText: 'Enter password',
-                labelText: 'Password',
-                controller: passController,
-                isPassword: true,
                 notNull: true,
+                prefixIcon: Icon(Icons.email, size: 20),
+              ),
+              Padding(padding: const EdgeInsets.fromLTRB(0, 0, 4, 0),
+                child:InputCustom(
+                  hintText: 'Enter password',
+                  labelText: 'Password',
+                  controller: passController,
+                  isPassword: !_obscureText,
+                  notNull: true,
+                  prefixIcon: Icon(Icons.lock_rounded, size: 20),
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _obscureText ? Icons.visibility : Icons.visibility_off,
+                      size: 20,
+                    ),
+                    onPressed: _toggle,
+                  ),
+                ),
               ),
               Padding(
                 padding: const EdgeInsets.only(bottom: 10, top: 20),
@@ -85,7 +108,7 @@ class _loginPageState extends State<LoginPage> {
                               context,
                               PageTransition(
                                 type: PageTransitionType.rightToLeft,
-                                child: HomePage(),
+                                child: ForgotPassword(),
                                 ctx: context,
                               ),
                             );
@@ -136,6 +159,21 @@ class _loginPageState extends State<LoginPage> {
 
       Navigator.push(context,
           PageTransition(type: PageTransitionType.fade, child:HomePage()));
+    }else{
+      AwesomeDialog(
+        context: context,
+        animType: AnimType.scale,
+        dialogType: DialogType.error,
+        body: Center(
+          child: Text(
+            "Email or password wrong",
+            style: TextStyle(fontStyle: FontStyle.normal),
+          ),
+        ),
+        title: 'This is Ignored',
+        desc: 'This is also Ignored',
+        btnOkOnPress: () {},
+      )..show();
     }
   }
 }

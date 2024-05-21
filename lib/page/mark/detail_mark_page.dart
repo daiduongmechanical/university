@@ -1,10 +1,12 @@
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/cupertino.dart';
 
-import '../component/two_rows_text.dart';
-import '../layout/normal_layout.dart';
-import '../model/mark.dart';
-import '../shared/shared.dart';
+import '../../component/two_rows_text.dart';
+import '../../layout/normal_layout.dart';
+import '../../model/mark.dart';
+import '../../shared/shared.dart';
+
+
 
 class DetailMarkPage extends StatefulWidget {
   DetailMarkPage({required this.data});

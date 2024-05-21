@@ -5,15 +5,15 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:stomp_dart_client/stomp_dart_client.dart';
 import 'package:university/shared/common.dart';
-import '../component/list_chart.dart';
-import '../data_type/ReciveMessage.dart';
-import '../data_type/SendMessage.dart';
-import '../layout/normal_layout.dart';
-import '../model/Message.dart';
+import '../../component/list_chart.dart';
+import '../../data_type/ReciveMessage.dart';
+import '../../data_type/SendMessage.dart';
+import '../../layout/normal_layout.dart';
+import '../../model/Message.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 
-import '../shared/shared.dart';
+import '../../shared/shared.dart';
 
 class DiscussPage extends StatefulWidget {
   DiscussPage({super.key, required this.roomId});

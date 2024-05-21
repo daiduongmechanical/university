@@ -4,20 +4,25 @@ import 'package:flutter/material.dart';
 import '../shared/shared.dart';
 
 class InputCustom extends StatelessWidget {
-   InputCustom(
+  InputCustom(
       {super.key,
-      required this.hintText,
+        required this.hintText,
         this.isPassword=false,
         this.notNull=false,
-      required this.labelText,
-      required this.controller,});
+        this.isEmail=false,
+        this.prefixIcon,
+        this.suffixIcon,
+        required this.labelText,
+        required this.controller,});
 
   final String hintText;
   final String labelText;
   final TextEditingController controller;
   final bool isPassword;
   final bool notNull;
-
+  final bool isEmail;
+  final Icon? prefixIcon;
+  final Widget? suffixIcon;
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -27,6 +32,12 @@ class InputCustom extends StatelessWidget {
         validator: (value) {
           if (value == null && notNull || value!.isEmpty && notNull) {
             return 'Please enter some text';
+
+          }
+
+          if(isEmail && !RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+              .hasMatch(value)){
+            return 'Please input a email.';
           }
           return null;
         },
@@ -41,6 +52,8 @@ class InputCustom extends StatelessWidget {
           ),
           hintText: hintText,
           labelText: labelText,
+          prefixIcon: prefixIcon,
+          suffixIcon: suffixIcon,
         ),
       ),
     );
