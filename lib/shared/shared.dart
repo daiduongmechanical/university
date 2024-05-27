@@ -14,6 +14,6 @@ const blurColor= Color.fromRGBO(208,228, 255, 1);
 const List<Color> randomColor=[ Colors.red,Colors.pink, Colors.yellowAccent,
   Colors.purple, Colors.deepOrangeAccent];
 
-const String wsUrl="ws://10.0.2.2:8081/api/ws";
+const String wsUrl="ws://192.168.110.115:8081/api/ws";
 
-const Ipv4PFT = "http://10.0.2.2:8081/";
+const Ipv4PFT = "http://192.168.110.115:8081/";

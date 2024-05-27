@@ -27,14 +27,15 @@ class CommonMethod{
      String jsonSource = '{"token":"$refreshToken"}';
      var url = Uri.parse(useUrl);
      var response = await http.post(url,headers:header,body:jsonSource);
+
      if(response.statusCode==200){
+
        var jsonData = json.decode(response.body);
 
        Token data = Token.fromJson(jsonData);
        prefs.setString("jwt", data.accessToken!);
 
        return data.accessToken;
-
      }else{
        return null;
      }

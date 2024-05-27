@@ -1,13 +1,14 @@
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
+import 'package:university/extention/text_extention.dart';
 import 'package:university/shared/shared.dart';
 
 import '../data_type/KeyType.dart';
 
 class InfoTag extends StatelessWidget {
   InfoTag({required this.data, this.icon, this.page, this.status, this.onIconPressed});
+
   List<KeyValue> data = [];
   late final Icon? icon;
   late final Widget? page;
@@ -114,7 +115,12 @@ class InfoTag extends StatelessWidget {
                     color: statusIcon[status] ?? Colors.grey,
                     icon: icon!,
                   ),
-                  Text(status!)
+                  Text(
+                    status!.capitalize(),
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  )
                 ],
               )
           ],

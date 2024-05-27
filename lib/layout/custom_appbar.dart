@@ -1,5 +1,6 @@
 
 import 'package:flutter/material.dart';
+import 'package:university/extention/text_extention.dart';
 
 import '../shared/shared.dart';
 
@@ -11,11 +12,10 @@ AppBar header(
   return AppBar(
     backgroundColor: MainColor,
     title: Text(
-      text,
+      text.capitalize(),
 
       style: const TextStyle(
         fontSize: 22,
-
         fontWeight: FontWeight.bold,
         color: Colors.white,
       ),

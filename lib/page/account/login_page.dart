@@ -152,8 +152,10 @@ class _loginPageState extends State<LoginPage> {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
 
       var jsonData = json.decode(response.body);
+
       LoginData data = LoginData.fromJson(jsonData);
-      prefs.setInt("id", data.userId!);
+      prefs.setInt("id", data.user!.userId!);
+      prefs.setString("userInfo",jsonEncode(data.user));
       prefs.setString("jwt", data.token!.accessToken!);
       prefs.setString("refreshToken", data.token!.refeshToken!);
 
