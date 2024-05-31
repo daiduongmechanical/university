@@ -6,9 +6,10 @@ import 'package:university/shared/shared.dart';
 
 import '../component/toLogin.dart';
 import '../model/Token.dart';
-import '../model/login_data.dart';
 
 class CommonMethod{
+
+  static String? FmcToken;
 
    static Map<String, String>  createHeader(String jwt) {
      Map<String, String> headers = {

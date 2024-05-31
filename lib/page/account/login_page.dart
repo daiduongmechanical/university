@@ -6,6 +6,7 @@ import 'package:page_transition/page_transition.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:university/model/login_data.dart';
+import 'package:university/shared/common.dart';
 
 import '../../component/custom_filled_button.dart';
 import '../../component/custom_text_field.dart';
@@ -158,9 +159,36 @@ class _loginPageState extends State<LoginPage> {
       prefs.setString("userInfo",jsonEncode(data.user));
       prefs.setString("jwt", data.token!.accessToken!);
       prefs.setString("refreshToken", data.token!.refeshToken!);
+String? fmcToken=CommonMethod.FmcToken;
+      String fmcBody =
+          '{"fmc":"${fmcToken}", "userId" :"${ data.user!.userId!}"}';
+      print(fmcBody);
+      String fmcUrl='$mainURL/api/user/save/app';
+      var fmcResult= await http.post(Uri.parse(fmcUrl),
+          headers: CommonMethod.createHeader(data.token!.accessToken!),
+        body: fmcBody);
+      if(fmcResult.statusCode==200){
+        Navigator.push(context,
+            PageTransition(type: PageTransitionType.fade, child:HomePage()));
+      }else{
+        AwesomeDialog(
+          context: context,
+          animType: AnimType.scale,
+          dialogType: DialogType.error,
+          body: Center(
+            child: Text(
+              "Have error please try again",
+              style: TextStyle(fontStyle: FontStyle.normal),
+            ),
+          ),
+          title: 'This is Ignored',
+          desc: 'This is also Ignored',
+          btnOkOnPress: () {},
+        )..show();
+      }
 
-      Navigator.push(context,
-          PageTransition(type: PageTransitionType.fade, child:HomePage()));
+
+
     }else{
       AwesomeDialog(
         context: context,

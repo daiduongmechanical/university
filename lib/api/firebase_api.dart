@@ -1,5 +1,7 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 
+import '../shared/common.dart';
+
 class FireBaseApi {
   static final _firebaseMessaging = FirebaseMessaging.instance;
 
@@ -14,6 +16,7 @@ class FireBaseApi {
          sound : true
     );
     final fCMToken = await _firebaseMessaging.getToken();
-    print("token : $fCMToken");
+    print(fCMToken);
+    CommonMethod.FmcToken=fCMToken!;
   }
 }

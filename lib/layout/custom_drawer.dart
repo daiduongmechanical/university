@@ -6,6 +6,7 @@ import 'package:page_transition/page_transition.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:university/model/user.dart';
 
+import '../component/toLogin.dart';
 import '../data_type/drawer_data.dart';
 
 import '../page/account/profile_page.dart';
@@ -129,7 +130,12 @@ class CustomDrawer extends StatelessWidget {
                       backgroundColor: MainColor,
                     ),
                     child: GestureDetector(
-                      onTap: () {},
+                      onTap: () async{
+                        SharedPreferences prefs = await SharedPreferences.getInstance();
+                        prefs.remove("refreshToken");
+                        toLogin(context);
+
+                      },
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [

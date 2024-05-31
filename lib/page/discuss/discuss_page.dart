@@ -213,7 +213,7 @@ class _DiscussState extends State<DiscussPage> {
                       text: "Topic :",
                       style:
                           TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                  TextSpan(text: "Ai là người đầu tiên ăn thịt chó ")
+                  TextSpan(text: "How many years did King Hung's reign last? ")
                 ])),
               ),
             ),
