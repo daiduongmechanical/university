@@ -79,7 +79,7 @@ class ListDiscussPage extends StatelessWidget {
                           KeyValue(key: "Topic", value: data[index].topic!)
                         ],
                         icon: Icon(Icons.navigate_next),
-                        page: DiscussPage(roomId: data[index].id!),
+                        page: DiscussPage(roomId: data[index].id!, Topic: data[index].topic!,),
                       );
                     },
                   );

@@ -11,14 +11,14 @@ import '../../data_type/SendMessage.dart';
 import '../../layout/normal_layout.dart';
 import '../../model/Message.dart';
 import 'package:http/http.dart' as http;
-import 'package:intl/intl.dart';
 
 import '../../shared/shared.dart';
 
 class DiscussPage extends StatefulWidget {
-  DiscussPage({super.key, required this.roomId});
+  DiscussPage({super.key, required this.roomId, required this.Topic});
 
   final int roomId;
+  final String Topic;
 
   @override
   State<DiscussPage> createState() => _DiscussState();
@@ -26,77 +26,81 @@ class DiscussPage extends StatefulWidget {
 
 class _DiscussState extends State<DiscussPage> {
   late StompClient client;
-  late final SharedPreferences prefs;
-  late final String jwt;
+  late SharedPreferences prefs;
+  late String jwt;
   final ScrollController _scrollController = ScrollController();
   final messageController = TextEditingController();
 
-  late int id = 0;
+  late int userId = 0;
 
   List<Message> messages = [];
 
   void onConnectCallback(StompFrame connectFrame) async {
     print("connected");
     client.subscribe(
-        destination: '/topic/public/2',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'Authorization': 'Bearer ' + jwt,
-        },
-        callback: (frame) {
-          var jsonData = json.decode(frame.body!);
-          print("listening");
-          ReciveMessage data = ReciveMessage.fromJson(jsonData);
-          if (data.type == "CHAT") {
-            setState(() {
-              messages.add(Message(
-                  id: data.id,
-                  text: data.text,
-                  createAt: data.createAt,
-                  senderName: data.senderName,
-                  senderId: data.senderId,
-                  teacher: true));
-            });
-            scrollToBottom();
-          }
+      destination: '/topic/public/${widget.roomId}',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': 'Bearer ' + jwt,
+      },
+      callback: (frame) {
+        var jsonData = json.decode(frame.body!);
 
-          if (data.type == "DELETE") {
-            messages.forEach((e) {
-              if (e.id == data.id) {
-                e.text = "This message is recalled";
-                e.deleted = true;
-              }
-              setState(() {});
-              scrollToBottom();
-            });
-          }
+        ReciveMessage data = ReciveMessage.fromJson(jsonData);
+        print(frame.body);
+        print(userId);
+        if (data.type == "CHAT") {
+          setState(() {
+            messageController.text="";
+            messages.add(Message(
+              id: data.id,
+              text: data.text,
+              createAt: data.createAt,
+              senderName: data.senderName,
+              senderId: data.senderId,
+              teacher: true,
+            ));
+          });
 
-          if (data.type == "OVER") {
-            if (data.senderId == id) {
-              AwesomeDialog(
-                context: context,
-                animType: AnimType.scale,
-                dialogType: DialogType.error,
-                body: Center(
-                  child: Text(
-                    "This discus is expired, can't sent new message",
-                    style: TextStyle(fontStyle: FontStyle.normal),
-                  ),
-                ),
-                title: 'This is Ignored',
-                desc: 'This is also Ignored',
-                btnOkOnPress: () {},
-              )..show();
+          scrollToBottom();
+        }
+
+        if (data.type == "DELETE") {
+          messages.forEach((e) {
+            if (e.id == data.id) {
+              e.text = "This message is deleted";
+              e.deleted = true;
             }
+            setState(() {});
+            scrollToBottom();
+          });
+        }
+
+        if (data.type == "OVER") {
+          if (data.senderId == userId) {
+            AwesomeDialog(
+              context: context,
+              animType: AnimType.scale,
+              dialogType: DialogType.error,
+              body: Center(
+                child: Text(
+                  "This discussion is expired, can't send new message",
+                  style: TextStyle(fontStyle: FontStyle.normal),
+                ),
+              ),
+              title: 'This is Ignored',
+              desc: 'This is also Ignored',
+              btnOkOnPress: () {},
+            )..show();
           }
-        });
+        }
+      },
+    );
   }
 
   void _scrollListener() {
-    if (_scrollController.offset >=
-            _scrollController.position.maxScrollExtent &&
-        !_scrollController.position.outOfRange) {
+    if (_scrollController.offset >= _scrollController.position.maxScrollExtent && !_scrollController.position.outOfRange) {
       // At the bottom of ListView
     }
   }
@@ -114,7 +118,6 @@ class _DiscussState extends State<DiscussPage> {
   }
 
   void action(response) {
-    print("run this code");
     final List<dynamic> responseData = json.decode(response.body);
     setState(() {
       responseData.forEach((json) {
@@ -123,29 +126,41 @@ class _DiscussState extends State<DiscussPage> {
     });
   }
 
-  void sendMessage() {
+  void sendMessage(String type,int? messId) {
     Map<String, String> headers = {"Content-type": "application/json"};
-
-    SendMessage mess = SendMessage(
+    SendMessage mess;
+    if (type == "CHAT") {
+      mess = SendMessage(
         sender: 'new sender',
         content: messageController.text,
-        id: id,
-        roomId: 2,
-        type: 'CHAT');
-    client.send(
-        destination: '/app/chat.sendMessage/2',
-        body: jsonEncode(mess),
-        headers: headers);
+        id: userId,
+        type: 'CHAT',
+        roomId: widget.roomId,
+      );
+    } else {
+      mess = SendMessage(
+        sender: 'new sender',
+        content: messId!= null ? messId.toString(): "0" ,
+        id: userId,
+        type: 'DELETE',
+        roomId: widget.roomId,
+      );
+    }
 
+    client.send(
+      destination: '/app/chat.sendMessage/${widget.roomId}',
+      body: jsonEncode(mess),
+      headers: headers,
+    );
     scrollToBottom();
   }
 
   Future getPageData() async {
     prefs = await SharedPreferences.getInstance();
     jwt = prefs.getString("jwt")!;
-    id = prefs.getInt("id")!;
+    userId = prefs.getInt("id")!;
     handleClient(jwt);
-    String useUrl = '$mainURL/api/discuss/room/2';
+    String useUrl = '$mainURL/api/discuss/room/${widget.roomId}';
     Map<String, String> headers = {"Content-type": "application/json"};
     var response = await http.get(Uri.parse(useUrl), headers: headers);
     await CommonMethod.handleGet(response, action, context, Uri.parse(useUrl));
@@ -161,9 +176,12 @@ class _DiscussState extends State<DiscussPage> {
           await Future.delayed(const Duration(milliseconds: 200));
           print('connecting...');
         },
-        onWebSocketError: (dynamic error) => client.deactivate(),
-        stompConnectHeaders: {'Authorization': '$jwt'},
-        webSocketConnectHeaders: {'Authorization': '$jwt'},
+        onWebSocketError: (dynamic error) {
+          print(error);
+          client.deactivate();
+        },
+        stompConnectHeaders: {'Authorization': 'Bearer ' + jwt},
+        webSocketConnectHeaders: {'Authorization': 'Bearer ' + jwt},
       ),
     );
     return client.activate();
@@ -188,82 +206,80 @@ class _DiscussState extends State<DiscussPage> {
   Widget build(BuildContext context) {
     scrollToBottom();
     return NormalLayout(
-        headText: "Discuss",
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              margin: EdgeInsets.only(bottom: 10),
-              decoration: BoxDecoration(
-                color: blurColor,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.5),
-                    spreadRadius: 2,
-                    blurRadius: 1,
-                    offset: Offset(0, 3),
+      headText: "Discuss",
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            margin: EdgeInsets.only(bottom: 10),
+            decoration: BoxDecoration(
+              color: blurColor,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.5),
+                  spreadRadius: 2,
+                  blurRadius: 1,
+                  offset: Offset(0, 3),
+                ),
+              ],
+            ),
+            height: 50,
+            child: Center(
+              child: Text.rich(TextSpan(children: [TextSpan(text: "Topic :", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)), TextSpan(text: widget.Topic)])),
+            ),
+          ),
+          Flexible(
+            child: ListChat(
+              messages: messages,
+              studentId: userId,
+              scrollController: _scrollController,
+              sentMessage: sendMessage, // Pass the function directly
+            ),
+          ),
+          Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.5),
+                  spreadRadius: 3,
+                  blurRadius: 3,
+                  offset: Offset(3, 0),
+                ),
+              ],
+            ),
+            height: 50,
+            child: Container(
+              decoration: BoxDecoration(border: Border.all(width: 1.5, color: MainColor)),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: messageController,
+                      decoration: InputDecoration(
+                        hintText: "Enter your message",
+                      ),
+                    ),
                   ),
+                  IconButton(
+                    onPressed: () {
+                      if (messageController.text.trim().isNotEmpty) {
+                        sendMessage("CHAT",null);
+                      }
+                      FocusManager.instance.primaryFocus?.unfocus();
+                    },
+                    icon: Icon(
+                      Icons.send,
+                      color: MainColor,
+                    ),
+                  )
                 ],
               ),
-              height: 50,
-              child: Center(
-                child: Text.rich(TextSpan(children: [
-                  TextSpan(
-                      text: "Topic :",
-                      style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                  TextSpan(text: "How many years did King Hung's reign last? ")
-                ])),
-              ),
             ),
-            Flexible(
-                child: ListChat(
-              messages: messages,
-              studentId: id,
-              scrollController: _scrollController,
-            )),
-            Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.5),
-                      spreadRadius: 3,
-                      blurRadius: 3,
-                      offset: Offset(3, 0),
-                    ),
-                  ],
-                ),
-                height: 50,
-                child: Container(
-                  decoration: BoxDecoration(
-                      border: Border.all(width: 1.5, color: MainColor)),
-                  child: Row(
-                    children: [
-                      Expanded(
-                          child: TextField(
-                        controller: messageController,
-                        decoration: InputDecoration(
-                          hintText: "Enter your message",
-                        ),
-                      )),
-                      IconButton(
-                          onPressed: () {
-                            if (messageController.text.trim().isNotEmpty) {
-                              sendMessage();
-                            }
-
-                            FocusManager.instance.primaryFocus?.unfocus();
-                          },
-                          icon: Icon(
-                            Icons.send,
-                            color: MainColor,
-                          ))
-                    ],
-                  ),
-                ))
-          ],
-        ));
+          )
+        ],
+      ),
+    );
   }
 }
