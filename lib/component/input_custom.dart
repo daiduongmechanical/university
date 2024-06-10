@@ -12,6 +12,7 @@ class InputCustom extends StatelessWidget {
         this.isEmail=false,
         this.prefixIcon,
         this.suffixIcon,
+        this.readOnly = false,
         required this.labelText,
         required this.controller,});
 
@@ -23,12 +24,14 @@ class InputCustom extends StatelessWidget {
   final bool isEmail;
   final Icon? prefixIcon;
   final Widget? suffixIcon;
+  final bool readOnly;
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(10, 30, 10, 0),
       child: TextFormField(
         controller: controller,
+        enabled: !readOnly,
         validator: (value) {
           if (value == null && notNull || value!.isEmpty && notNull) {
             return 'Please enter some text';
