@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:university/layout/normal_layout.dart';
 import 'package:http/http.dart' as http;
 import 'package:university/model/news.dart';
@@ -47,14 +48,26 @@ if(response.statusCode==200){
       child: FutureBuilder(
         future: getApi(),
         builder: (context, snapshot){
-          return SingleChildScrollView(
-            child: Column(
-              children: [
-                Text(data.title!,style: TextStyle(fontSize: 18,fontWeight: FontWeight.bold),),
-                Html(data:bodyshow,)
-              ],
-            ),
-          );
+          if(snapshot.hasError){
+            return Center(child: Text("have error happen"),);
+          }else if(snapshot.connectionState== ConnectionState.waiting){
+            return Center(
+                child: LoadingAnimationWidget.discreteCircle(
+                  size: 70,
+                  color: Colors.purple,
+                ));
+          }else{
+            return SingleChildScrollView(
+              child: Column(
+                children: [
+                  Text(data.title!,style: TextStyle(fontSize: 18,fontWeight: FontWeight.bold),),
+                  Html(data:bodyshow,)
+                ],
+              ),
+            );
+          }
+
+
         },
       )
     );

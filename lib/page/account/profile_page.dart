@@ -167,7 +167,7 @@ class _UpdateProfileScreenState extends State<ProfilePage> {
                             ),
                             radius: 48.0,
                             backgroundImage: NetworkImage(
-                              '$mainURL/getimage/${profile.avatar}',
+                              '$imageUrl/getimage/${profile.avatar}',
                             ),
                           ),
                         ),

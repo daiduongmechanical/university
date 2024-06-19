@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 import 'package:page_transition/page_transition.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -30,7 +31,7 @@ class CustomDrawer extends StatelessWidget {
 
   String userName = '';
   String studentCode = '';
-  String url = '';
+  late String url ;
 
   Future<void> getData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -39,8 +40,8 @@ class CustomDrawer extends StatelessWidget {
     if (userJson != null) {
       User data = User.fromJson(jsonDecode(userJson));
       userName = data.name!;
-      studentCode = data.code!;
-      url = "https://letsenhance.io/static/8f5e523ee6b2479e26ecc91b9c25261e/1015f/MainAfter.jpg";
+      studentCode = data.code??"Student code";
+      url ="${imageUrl}/${data.avatar}";
     } else {
       url = "https://letsenhance.io/static/8f5e523ee6b2479e26ecc91b9c25261e/1015f/MainAfter.jpg";
     }
@@ -54,7 +55,13 @@ class CustomDrawer extends StatelessWidget {
       builder: (context, snapshot) {
         if (snapshot.hasError) {
           return Drawer();
-        } else {
+        } else if(snapshot.connectionState== ConnectionState.waiting) {
+          return Center(
+              child: LoadingAnimationWidget.discreteCircle(
+                size: 70,
+                color: Colors.purple,
+              ));
+    }else{
           return Drawer(
             backgroundColor: Colors.white,
             shadowColor: Colors.red,
