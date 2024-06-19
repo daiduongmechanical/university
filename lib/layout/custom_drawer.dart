@@ -1,10 +1,13 @@
 import 'dart:convert';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 import 'package:page_transition/page_transition.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:university/model/user.dart';
+import 'package:university/page/account/login_page.dart';
 
 import '../component/toLogin.dart';
 import '../data_type/drawer_data.dart';
@@ -18,11 +21,10 @@ class CustomDrawer extends StatelessWidget {
     DrawerData(name: 'Resgister subject', icon: const Icon(Icons.home), page: "/register"),
     DrawerData(name: "Discuss", icon: Icon(Icons.chat_bubble), page: "/discuss"),
     DrawerData(name: "View process", icon: Icon(Icons.list), page: "/process"),
+    DrawerData(name: "Exam", icon: Icon(Icons.quiz), page: "/quizlist"),
     DrawerData(name: 'Time table', icon: const Icon(Icons.calendar_month), page: "/timeTable"),
     DrawerData(name: 'Mark report', icon: const Icon(Icons.view_comfortable), page: "/mark"),
   ];
-
-
 
   CustomDrawer({Key? key});
 
@@ -60,66 +62,76 @@ class CustomDrawer extends StatelessWidget {
             width: MediaQuery.of(context).size.width * 0.75,
             child: Column(
               children: [
-                GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => ProfilePage()),
-                    );
-                  },
-                  child: SizedBox(
-                    height: 220,
-                    child: DrawerHeader(
-                      decoration: const BoxDecoration(
-                        color: MainColor,
-                      ),
-                      padding: const EdgeInsets.all(5),
-                      child: Container(
-                        width: MediaQuery.of(context).size.width,
-                        child: Column(
-                          children: [
-                            CircleAvatar(
-                              radius: 40,
-                              backgroundImage: NetworkImage(url),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(top: 20, bottom: 10),
-                              child: Text(
-                                userName,
-                                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+                Expanded(
+                  flex: 3,
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => ProfilePage()),
+                      );
+                    },
+                    child: SizedBox(
+                      height: 220,
+                      child: DrawerHeader(
+                        decoration: const BoxDecoration(
+                          color: MainColor,
+                        ),
+                        padding: const EdgeInsets.all(5),
+                        child: Container(
+                          width: MediaQuery.of(context).size.width,
+                          child: Column(
+                            children: [
+                              CircleAvatar(
+                                radius: 40,
+                                backgroundImage: NetworkImage(url),
                               ),
-                            ),
-                            Text(studentCode, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
-                          ],
+                              Padding(
+                                padding: const EdgeInsets.only(top: 10, bottom: 10),
+                                child: Text(
+                                  userName,
+                                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+                                ),
+                              ),
+                              Text(studentCode, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
+                            ],
+                          ),
                         ),
                       ),
                     ),
                   ),
                 ),
-                for (final c in drawerItems)
-                  Container(
-                    width: MediaQuery.of(context).size.width * 0.65,
-                    decoration: BoxDecoration(
-                      color: current == c.page ? blurColor : Colors.transparent,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: ListTile(
-                      leading: c.icon,
-                      title: Text(
-                        c.name,
-                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                      ),
-                      onTap: () {
-                        Scaffold.of(context).closeEndDrawer();
-                        Navigator.pushNamed(context, c.page);
+                Expanded(
+                  flex: 6,
+                  child: Container(
+                    child: ListView.builder(
+                      itemCount: drawerItems.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        DrawerData c = drawerItems[index];
+                        return Container(
+                          width: MediaQuery.of(context).size.width * 0.65,
+                          decoration: BoxDecoration(
+                            color: current == c.page ? blurColor : Colors.transparent,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: ListTile(
+                            leading: c.icon,
+                            title: Text(
+                              c.name,
+                              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                            ),
+                            onTap: () {
+                              Scaffold.of(context).closeEndDrawer();
+                              Navigator.pushNamed(context, c.page);
+                            },
+                          ),
+                        );
                       },
                     ),
                   ),
-                Expanded(
-                  child: Container(),
                 ),
                 SizedBox(
-                  height: 50,
+                  height: 40,
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: () {},
@@ -130,11 +142,15 @@ class CustomDrawer extends StatelessWidget {
                       backgroundColor: MainColor,
                     ),
                     child: GestureDetector(
-                      onTap: () async{
+                      onTap: () async {
                         SharedPreferences prefs = await SharedPreferences.getInstance();
                         prefs.remove("refreshToken");
-                        toLogin(context);
-
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => LoginPage(),
+                          ),
+                        );
                       },
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,

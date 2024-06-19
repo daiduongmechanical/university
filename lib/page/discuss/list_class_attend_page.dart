@@ -44,6 +44,7 @@ class ListClassAttend extends StatelessWidget {
 
       var url = Uri.parse(useUrl);
       var response = await http.get(url, headers: CommonMethod.createHeader(jwt));
+      print(response.statusCode);
      await CommonMethod.handleGet(response, action, context, url);
     }
 

@@ -1,116 +1,189 @@
-import 'package:awesome_dialog/awesome_dialog.dart';
-import 'package:flutter/cupertino.dart';
+import 'dart:convert';
+import 'dart:core';
 
-import '../../component/two_rows_text.dart';
-import '../../layout/normal_layout.dart';
-import '../../model/mark.dart';
+import 'package:flutter/material.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:university/component/two_rows_text.dart';
+import 'package:university/layout/normal_layout.dart';
+import 'package:http/http.dart' as http;
+import '../../data_type/KeyType.dart';
+import '../../model/markDetail.dart';
+import '../../shared/common.dart';
 import '../../shared/shared.dart';
 
+class MarkDetailPage extends StatelessWidget {
+  MarkDetailPage({super.key, required this.classId});
 
+  final int classId;
 
-class DetailMarkPage extends StatefulWidget {
-  DetailMarkPage({required this.data});
+  late List<KeyValue> listShow = [];
+  late DetailMark data;
 
-  final Mark data;
+  Color showColor(double num) {
+    if (num <= 40) {
+      return Colors.red;
+    }
+    if (num > 40 && num <= 65) {
+      return Colors.black;
+    }
+    if (num > 65&& num <= 80) {
+      return Colors.green;
+    }
+    if (num >= 80) {
+      return Colors.blue;
+    }
 
-  @override
-  _DetailMarkPageState createState() => _DetailMarkPageState();
-}
+    return Colors.black;
+  }
 
-class _DetailMarkPageState extends State<DetailMarkPage> {
+  action(response) {
+    var responseData = json.decode(response.body);
+
+    data = DetailMark.fromJson(responseData);
+    listShow.clear();
+    listShow.add(KeyValue(key: "Class", value: data.markTotal!.className!));
+    listShow.add(KeyValue(key: "Subject", value: data.markTotal!.subjectName!));
+    listShow.add(KeyValue(key: "Teacher", value: data.markTotal!.teacherName!));
+  }
+
   @override
   Widget build(BuildContext context) {
+    Future<void> getApiData() async {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      final int id = prefs.getInt("id")!;
+      String useUrl = '$mainURL/api/mark/detail/${id}/${classId}';
+      print(useUrl);
+      final String jwt = prefs.getString("jwt")!;
+
+      var url = Uri.parse(useUrl);
+      var response = await http.get(url, headers: CommonMethod.createHeader(jwt));
+      print(response.body);
+      await CommonMethod.handleGet(response, action, context, url);
+    }
+
     return NormalLayout(
-      headText: 'Mark details',
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(20, 10, 20, 30),
-        child: Column(
-          children: [
-            Expanded(
-              flex: 2,
-              child: Center(
-                child: Text(
-                  widget.data.name ?? "Default",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 30,
-                  ),
+        headText: "Mark details",
+        child: FutureBuilder(
+          future: getApiData(),
+          builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+            if (snapshot.hasError) {
+              print(snapshot.error);
+              return Text("have error happen");
+            } else if (snapshot.connectionState == ConnectionState.waiting) {
+              return Center(
+                child: LoadingAnimationWidget.discreteCircle(
+                  size: 70,
+                  color: Colors.purple,
                 ),
-              ),
-            ),
-            Expanded(
-              flex: 1,
-              child: TwoRowText(
-                name: 'Semester ${widget.data.semester}',
-                value: '${widget.data.year} - ${widget.data.year! + 1}',
-              ),
-            ),
-            Expanded(
-              flex: 1,
-              child: TwoRowText(
-                name: 'Teacher',
-                value: widget.data.teacher ?? 'Default',
-              ),
-            ),
-            Expanded(
-              flex: 1,
-              child: TwoRowText(
-                name: 'Class',
-                value: widget.data.classData ?? 'Default',
-              ),
-            ),
-            Expanded(
-              flex: 1,
-              child: TwoRowText(
-                name: 'Regular point',
-                value: '${widget.data.normalMark}',
-              ),
-            ),
-            Expanded(
-              flex: 1,
-              child: TwoRowText(
-                name: 'Middle point',
-                value: '${widget.data.middleMark}',
-              ),
-            ),
-            Expanded(
-              flex: 1,
-              child: TwoRowText(
-                name: 'Final point',
-                value: '${widget.data.finalMark}',
-              ),
-            ),
-            Expanded(
-              flex: 1,
-              child: TwoRowText(
-                name: 'Average point',
-                value: '${widget.data.averageMark}',
-              ),
-            ),
-            Expanded(
-              flex: 1,
-              child: AnimatedButton(
-                text: "Register again",
-                width: MediaQuery.of(context).size.width * 0.6,
-                color: MainColor,
-                pressEvent: () {
-                  AwesomeDialog(
-                    context: context,
-                    dialogType: DialogType.warning,
-                    animType: AnimType.topSlide,
-                    title: "Warning",
-                    desc: "Are you sure you want to register again for this subject?",
-                    btnOkOnPress: () {
-                      // Add your logic for registering again
-                    },
-                    btnCancelOnPress: () {},
-                  ).show();
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
+              );
+            } else {
+              return Container(
+                height: MediaQuery.of(context).size.height,
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: Container(
+                        color: blurColor,
+                        padding: EdgeInsets.fromLTRB(MediaQuery.of(context).size.width * 0.2, 30, MediaQuery.of(context).size.width * 0.2, 0),
+                        child: ListView.builder(
+                          itemCount: listShow.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            KeyValue item = listShow[index];
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 15),
+                              child: TwoRowText(
+                                name: item.key + ' : ',
+                                value: item.value,
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                      flex: 3,
+                    ),
+                    Expanded(
+                      child: Container(
+                        width: MediaQuery.of(context).size.width,
+                        padding: EdgeInsets.fromLTRB(5, 20, 5, 0),
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.vertical,
+                          child: Container(
+                            decoration: BoxDecoration(border: Border.all()),
+                            child: DataTable(
+                              columns: const <DataColumn>[
+                                DataColumn(
+                                  label: Expanded(
+                                    child: Text(
+                                      'Type',
+                                      style: TextStyle(fontStyle: FontStyle.italic),
+                                    ),
+                                  ),
+                                ),
+                                DataColumn(
+                                  label: Expanded(
+                                    child: Text(
+                                      'Mark',
+                                      style: TextStyle(fontStyle: FontStyle.italic),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                              rows: <DataRow>[
+                                DataRow(
+                                  cells: <DataCell>[
+                                    DataCell(Text('Normal mark')),
+                                    DataCell(Text(data.normalMark == 0.0 ? "" : "${data.normalMark}")),
+                                  ],
+                                ),
+                                DataRow(
+                                  cells: <DataCell>[
+                                    DataCell(Text('Middle mark')),
+                                    DataCell(Text(data.normalMark == 0.0 ? "" : "${data.middleMark}")),
+                                  ],
+                                ),
+                                DataRow(
+                                  cells: <DataCell>[
+                                    DataCell(Text('Final mark')),
+                                    DataCell(Text(data.normalMark == 0.0 ? "" : "${data.fiinalMark}")),
+                                  ],
+                                ),
+                                DataRow(
+                                  cells: <DataCell>[
+                                    DataCell(Text(
+                                      'Average mark',
+                                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                    )),
+                                    DataCell(Text(
+                                      data.normalMark == 0.0 ? "" : "${data.markTotal!.finalMark}",
+                                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: showColor(data.markTotal!.finalMark!)),
+                                    )),
+                                  ],
+                                ),
+                                DataRow(
+                                  cells: <DataCell>[
+                                    DataCell(Text(
+                                      'rank',
+                                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                    )),
+                                    DataCell(Text(
+                                      data.result ?? "Waiting",
+                                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: showColor(data.markTotal!.finalMark!)),
+                                    )),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      flex:7,
+                    )
+                  ],
+                ),
+              );
+            }
+          },
+        ));
   }
 }

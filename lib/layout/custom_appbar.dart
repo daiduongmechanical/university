@@ -21,7 +21,7 @@ AppBar header(
       ),
     ),
     centerTitle: true,
-    leading: IconButton(
+    leading: Navigator.of(context).canPop() ? IconButton(
       icon: const Icon(
         Icons.arrow_back_ios_outlined,
         size: 26,
@@ -32,7 +32,7 @@ AppBar header(
           Navigator.of(context).pop(false);
         }
       },
-    ),
+    ) :null,
     actions: [
       IconButton(
         icon: const Icon(

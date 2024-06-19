@@ -9,7 +9,9 @@ import 'package:http/http.dart' as http;
 import '../../component/Hien/Model/category.dart';
 import '../../component/Hien/Model/student_subject.dart';
 import '../../component/Hien/Model/subject.dart';
+import '../../component/toLogin.dart';
 import '../../layout/normal_layout.dart';
+import '../../shared/common.dart';
 import '../../shared/shared.dart';
 import 'list_class.dart';
 import 'list_register_subject.dart';
@@ -32,6 +34,7 @@ class ApiState extends State<RegisterPage> with SingleTickerProviderStateMixin {
 
   late SharedPreferences prefs;
   late  String jwt ="";
+  late  int studentId ;
   late final int subjectId;
   late final String subjectName;
   bool showAllSubject = true;
@@ -49,13 +52,11 @@ class ApiState extends State<RegisterPage> with SingleTickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-
     _tabController = TabController(length: 3, vsync: this);
     initializeData(); // Call the method to initialize data
   }
   void initializeData() async {
     try {
-      await fetchJwtToken();
       await CallApList();
       await ListCategory();
       await listStudentSubjects();
@@ -316,8 +317,16 @@ class ApiState extends State<RegisterPage> with SingleTickerProviderStateMixin {
 
 
   Future<void> CallApList() async {
+
+    prefs = await SharedPreferences.getInstance();
     jwt = prefs.getString("jwt")!;
+    studentId = prefs.getInt("id")!;
     String useUrl = Ipv4PFT + "api/ClassRegister/list";
+
+    Map<String, dynamic> requestBody = {
+      "studentId": studentId
+    };
+
     Map<String, String> headers = {
       'Content-Type': 'application/json',
       'Accept': 'application/json',
@@ -325,7 +334,8 @@ class ApiState extends State<RegisterPage> with SingleTickerProviderStateMixin {
     };
     var url = Uri.parse(useUrl);
 
-    final result = await http.get(url,headers: headers);
+    final result = await http.post(
+        url, headers: headers, body: jsonEncode(requestBody));
     if (result.statusCode == 200) {
       var bodyData = jsonDecode(result.body) as List;
       List<Subject> posts = bodyData.map((postData) {
@@ -333,12 +343,36 @@ class ApiState extends State<RegisterPage> with SingleTickerProviderStateMixin {
       }).toList();
       setState(() {
         pData = posts;
-        newSubject =pData;
+        newSubject = pData;
       });
+    }
+    else if (result.statusCode == 403) {
+      String? newToken = await CommonMethod.refreshToken();
+      if (newToken == null) {
+        if (mounted) {
+          toLogin(context);
+        }
+      }
+      else {
+        var result = await http.post(
+          url,
+          headers: CommonMethod.createHeader(newToken),
+            body: jsonEncode(requestBody)
+        );
+
+        var bodyData = jsonDecode(result.body) as List;
+        List<Subject> posts = bodyData.map((postData) {
+          return Subject.fromJson(postData);
+        }).toList();
+        setState(() {
+          pData = posts;
+          newSubject = pData;
+        });
+      }
     }
     else
       {
-        print("Failed to get List Subject");
+        print(result.statusCode);
       }
   }
 
@@ -399,7 +433,7 @@ class ApiState extends State<RegisterPage> with SingleTickerProviderStateMixin {
   }
 
   Future<void> ListCategory() async {
-    jwt = prefs.getString("jwt")!;
+      jwt = prefs.getString("jwt")!;
      String useUrl = Ipv4PFT + "api/listcate";
      Map<String, String> headers = {
        'Content-Type': 'application/json',
@@ -421,34 +455,33 @@ class ApiState extends State<RegisterPage> with SingleTickerProviderStateMixin {
         selectedCategory = categoryList.isNotEmpty ? categoryList.first : '';
       });
     }
-    else
-      {
-        throw Exception('Failed to load data');
+    else if (resutl.statusCode == 403) {
+      String? newToken = await CommonMethod.refreshToken();
+      if (newToken == null) {
+        if (mounted) {
+          toLogin(context);
+        }
+      } else {
+        var responseTwo = await http.get(
+          url,
+          headers: CommonMethod.createHeader(newToken),
+        );
+        var bodyData = jsonDecode(resutl.body) as List;
+        List<Category> listcate = bodyData.map((postData) {
+          return Category.fromJson(postData);
+        }).toList();
+        setState(() {
+          category = listcate;
+          categoryList = listcate.map((category) => category.name!).toList();
+          selectedCategory = categoryList.isNotEmpty ? categoryList.first : '';
+        });
       }
-  }
-
-  Future<String> fetchJwtToken() async {
-      prefs = await SharedPreferences.getInstance();
-    var url = Ipv4PFT + "api/login";
-    Map<String, dynamic> requestData = {
-      "email": "student@gmail.com",
-      "password": "1",
-    };
-    final response = await http.post(
-      Uri.parse(url),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: jsonEncode(requestData),
-    );
-    if (response.statusCode == 200) {
-      print("successfully get JWT token");
-      await prefs.setString('jwt', response.body);
-      print("response: "+response.body);
-
-      return response.body;
-    } else {
-      throw Exception('Failed to fetch JWT token');
+    }
+    else
+    {
+      print("Error");
     }
   }
+
+
 }

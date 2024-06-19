@@ -1,19 +1,16 @@
 import 'dart:convert';
-
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
-import 'package:page_transition/page_transition.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:university/component/info_tag.dart';
 
-import '../../component/custom_select.dart';
-import '../../data_type/select_time_data.dart';
+import '../../data_type/KeyType.dart';
 import '../../layout/normal_layout.dart';
 import '../../model/mark.dart';
+import '../../shared/common.dart';
 import '../../shared/shared.dart';
 import 'detail_mark_page.dart';
-
 
 class MarkReportPage extends StatefulWidget {
   @override
@@ -21,179 +18,71 @@ class MarkReportPage extends StatefulWidget {
 }
 
 class MarkReportPageState extends State<MarkReportPage> {
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  late int _semesterSelect = DateTime.now().month - 8 >= 0 ? 2 : 1;
-  late int _yearSelect = DateTime.now().year;
-  late List<Mark> listMark = [];
+  late List<MarkTotal> data = [];
 
-  Future<void> getApiCourse(
-      {required int year, required int id, required int semester}) async {
-    final apiUrl = "${mainURL}/mark?year=${year}&id=${id}&semester=${semester}";
-    try {
-      final response = await http.get(Uri.parse(apiUrl));
-
-      if (response.statusCode == 200) {
-        final List<dynamic> responseData = json.decode(response.body);
-        listMark.clear();
-        responseData.forEach((courseJson) {
-          listMark.add(Mark.fromJson(courseJson));
-        });
-
-        print(listMark.length);
-      } else {
-        throw Exception('Failed to load data from API');
-      }
-    } catch (e) {
-      print('Error: $e');
-    }
+  void action(response) {
+    data.clear();
+    final List<dynamic> responseData = json.decode(response.body);
+    responseData.forEach((json) {
+      data.add(MarkTotal.fromJson(json));
+    });
   }
 
-  List<SelectTimeDate> data = [
-    SelectTimeDate(value: 1, key: 'Semester 1'),
-    SelectTimeDate(value: 2, key: 'Semester 2')
-  ];
+  Future<void> getApiData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final int id = prefs.getInt("id")!;
+    String useUrl = '$mainURL/api/mark/$id';
+    final String jwt = prefs.getString("jwt")!;
 
-  List<SelectTimeDate> listYear = [
-    SelectTimeDate(value: 2023, key: '2023-2024'),
-    SelectTimeDate(value: 2024, key: '2024-2025')
-  ];
+    var url = Uri.parse(useUrl);
+    var response = await http.get(url, headers: CommonMethod.createHeader(jwt));
+    print(response.statusCode);
+    await CommonMethod.handleGet(response, action, context, url);
+  }
 
   @override
   Widget build(BuildContext context) {
     return NormalLayout(
-      headText: 'Mark report',
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(10, 20, 10, 5),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              Expanded(
-                flex: 2,
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: CustomSelect(
-                        onChanged: (value) {
-                          setState(() {
-                            _semesterSelect = value!;
-                          });
-                          getApiCourse(
-                              year: _yearSelect,
-                              id: 1,
-                              semester: _semesterSelect);
-                        },
-                        data: data,
-                        text: 'Semester',
-                      ),
-                    ),
-                    Expanded(
-                        child: CustomSelect(
-                      onChanged: (value) {
-                        setState(() {
-                          _yearSelect = value!;
-                        });
-                        getApiCourse(
-                            year: _yearSelect,
-                            id: 1,
-                            semester: _semesterSelect);
-                      },
-                      data: listYear,
-                      text: 'Year',
-                    ))
-                  ],
-                ),
-              ),
-              Expanded(
-                flex: 8,
-                child: Container(
-                  child: ListView.builder(
-                    itemCount: listMark.length,
-                    itemBuilder: (context, index) {
-                      Mark item = listMark[index];
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 10),
-                        child: Align(
-                          alignment: Alignment.center,
-                          child: IntrinsicHeight(
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: Colors.grey.withOpacity(0.2),
-                                border: Border.all(color: Colors.black),
-                              ),
-                              child: GestureDetector(
-                                onTap: (){
-                                  Scaffold.of(context).closeEndDrawer();
-                                  Navigator.push(
-                                    context,
-                                    PageTransition(
-                                      type: PageTransitionType.rightToLeft,
-                                      child: DetailMarkPage(data: item,),
-                                      ctx: context,
-                                    ),
-                                  );
-                                },
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Expanded(
-                                      flex: 7,
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                          border: Border.all(color: Colors.black),
-                                        ),
-                                        child: Container(
-                                          height: double.infinity, // Set height to maximum allowed
-                                          decoration: BoxDecoration(
-                                            border: Border(
-                                              bottom: BorderSide(color: Colors.black),
-                                            ),
-                                          ),
-                                          child: Center(child: Text(item.name ??"default")),
-                                        ),
-                                      ),
-                                    ),
-                                    Expanded(
-                                      flex: 3,
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                          border: Border.all(color: Colors.black),
-                                        ),
-                                        child: Column(
-                                          children: [
-                                            Container(
-                                              height: 40,
-                                              decoration: BoxDecoration(
-                                                border: Border(
-                                                  bottom: BorderSide(color: Colors.black),
-                                                ),
-                                              ),
-                                              child: Center(child: Text(item.averageMark.toString() ?? "pending")),
-                                            ),
-                                            Container(
-                                              height: 40,
-                                              child: Center(child: Text("Content 3")),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      );
-                    },
+        headText: 'Mark report',
+        child: FutureBuilder(
+            future: getApiData(),
+            builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+              if (snapshot.hasError) {
+                print (snapshot.error);
+                return Center(child: Text("have error happen"));
+              } else if (snapshot.connectionState == ConnectionState.waiting) {
+                return Center(
+                  child: LoadingAnimationWidget.discreteCircle(
+                    size: 70,
+                    color: Colors.purple,
                   ),
-
-                ),
-              )
-            ],
-          ),
-        ),
-      ),
-    );
+                );
+              } else {
+                return SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      SizedBox( height: 20,),
+                      Container(
+                        height: MediaQuery.of(context).size.height,
+                  
+                        child: ListView.builder(
+                            itemCount: data.length,
+                            itemBuilder: (BuildContext context, int index) {
+                              MarkTotal item = data[index];
+                              return InfoTag(data: [
+                                KeyValue(key: "Class", value: item.className!),
+                                KeyValue(key: "Subject", value: item.subjectName!),
+                                KeyValue(key: "Teacher", value: item.teacherName!),
+                                KeyValue(key: "Total mark", value: item.finalMark == 0.0 ? "waiting" : item.finalMark.toString()),
+                              ], icon: Icon(Icons.navigate_next),
+                                page: MarkDetailPage(classId: item.classId!,),
+                              );
+                            }),
+                      )
+                    ],
+                  ),
+                );
+              }
+            }));
   }
 }

@@ -7,6 +7,7 @@ import 'package:university/page/time_table_page.dart';
 import 'package:university/page/RegisterSubject/subject_register_page.dart';
 import 'package:university/page/homepage.dart';
 
+import '../page/Quiz/quiz_list.dart';
 import '../page/process/process_attend_page.dart';
 
 Route<dynamic>? generateRoute(RouteSettings settings) {
@@ -47,6 +48,14 @@ Route<dynamic>? generateRoute(RouteSettings settings) {
         type: PageTransitionType.rightToLeft,
         settings: settings,
       );
+
+    case '/quizlist':
+      return PageTransition(
+        child: QuizList(),
+        type: PageTransitionType.rightToLeft,
+        settings: settings,
+      );
+
     default:
       return null;
   }

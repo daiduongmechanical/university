@@ -130,7 +130,7 @@ class _CurentRegisCLassState extends State<CurentRegisCLass> {
                           final currentClass = data[index];
                           final teacherName = currentClass.classForSubject!
                               .teacher!.name!;
-                          final className = currentClass.classForSubject!.name!;
+                          final className = currentClass.classForSubject?.name;
                           final classTime = currentClass.classForSubject!
                               .dateStart != null
                               ? '${currentClass.classForSubject!.dateStart!

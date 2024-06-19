@@ -6,7 +6,6 @@ class StudentSubject {
   final int? id;
   final User? student;
   final ClassForSubject? classForSubject;
-
   StudentSubject({this.id, this.student, this.classForSubject});
 
   factory StudentSubject.fromJson(Map<String, dynamic> json) {
@@ -29,3 +28,4 @@ class StudentSubject {
     );
   }
 }
+

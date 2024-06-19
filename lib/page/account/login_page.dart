@@ -167,9 +167,14 @@ String? fmcToken=CommonMethod.FmcToken;
       var fmcResult= await http.post(Uri.parse(fmcUrl),
           headers: CommonMethod.createHeader(data.token!.accessToken!),
         body: fmcBody);
+
       if(fmcResult.statusCode==200){
-        Navigator.push(context,
-            PageTransition(type: PageTransitionType.fade, child:HomePage()));
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => HomePage(),
+          ),
+        );
       }else{
         AwesomeDialog(
           context: context,

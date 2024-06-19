@@ -8,6 +8,7 @@ import 'package:http/http.dart' as http;
 import 'package:university/page/account/verifyOtpScreen.dart';
 import 'package:university/shared/shared.dart';
 import '../../component/input_custom.dart';
+import '../../layout/no_drawer_layout.dart';
 
 
 class ForgotPassword extends StatelessWidget {
@@ -37,7 +38,7 @@ class ForgotPassword extends StatelessWidget {
       }
     }
 
-    return NormalLayout(
+    return NoDrawerLayout(
       headText: "ForgotPassword",
       child: Form(
         key: _formKey,

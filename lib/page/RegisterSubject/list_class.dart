@@ -1,5 +1,6 @@
 
 import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:university/component/Hien/Model/Class_For_Subject.dart';
 import 'package:university/layout/normal_layout.dart';
 import 'package:flutter/material.dart';
@@ -21,6 +22,10 @@ class ClassList extends StatefulWidget{
   }
 }
 class ClassApi extends State<ClassList> {
+  late SharedPreferences prefs;
+  late  String jwt ="";
+  late  int studentId ;
+
   late List<ClassForSubject> classSubject = [];
   final int subjectId;
   final String subjectName;
@@ -147,16 +152,27 @@ class ClassApi extends State<ClassList> {
 
   Future<void> listClass() async {
 
+    prefs = await SharedPreferences.getInstance();
+    jwt = prefs.getString("jwt")!;
+    studentId = prefs.getInt("id")!;
     String url = Ipv4PFT+"listClass";
-   // String url = "http://10.0.2.2:8081/listClass";
-    String requestBody = subjectId.toString();
+    Map<String, dynamic> requestBody = {
+      "studentId": studentId,
+      "subjectId" : subjectId
+    };
+
+    Map<String, String> headers = {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      'Authorization': 'Bearer ' + jwt,
+    };
+
+
     // Create a map containing the student ID
     final response = await http.post(
       Uri.parse(url),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: requestBody,
+      headers:headers,
+      body: jsonEncode(requestBody),
     );
     if (response.statusCode == 200) {
       var bodyData = jsonDecode(response.body) as List;
