@@ -152,11 +152,11 @@ class CustomDrawer extends StatelessWidget {
                       onTap: () async {
                         SharedPreferences prefs = await SharedPreferences.getInstance();
                         prefs.remove("refreshToken");
-                        Navigator.pushReplacement(
+                        Navigator.pushAndRemoveUntil(
                           context,
                           MaterialPageRoute(
                             builder: (context) => LoginPage(),
-                          ),
+                          ),ModalRoute.withName('/')
                         );
                       },
                       child: Row(

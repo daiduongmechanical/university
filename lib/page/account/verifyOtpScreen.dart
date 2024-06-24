@@ -4,10 +4,9 @@ import 'dart:convert';
 
 import 'package:university/component/custom_filled_button.dart';
 import 'package:university/layout/normal_layout.dart';
-import 'package:university/page/account/login_page.dart';
+import 'package:university/page/account/changePassword.dart'; // Import the ChangePasswordScreen
 import '../../component/input_custom.dart';
 import '../../shared/shared.dart';
-
 
 class VerifyOtpScreen extends StatelessWidget {
   final String email;
@@ -32,7 +31,7 @@ class VerifyOtpScreen extends StatelessWidget {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => LoginPage(),
+                builder: (context) => ChangePasswordScreen(email: email), // Navigate to ChangePasswordScreen
               ),
             );
           } else {
@@ -47,7 +46,6 @@ class VerifyOtpScreen extends StatelessWidget {
         }
       }
     }
-
 
     return NormalLayout(
       headText: "Verify OTP",
@@ -69,14 +67,15 @@ class VerifyOtpScreen extends StatelessWidget {
               notNull: true,
             ),
             Padding(
-            padding: const EdgeInsets.fromLTRB(0,10,0,0),
-                    child:CustomFilledButton(text: "Verify OTP", onTap: _verifyOtp),
+              padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
+              child: CustomFilledButton(text: "Verify OTP", onTap: _verifyOtp),
             ),
           ],
         ),
       ),
     );
   }
+
   Future<bool> verifyOtp(String email, String otp) async {
     print(email);
     print(otp);
@@ -93,4 +92,3 @@ class VerifyOtpScreen extends StatelessWidget {
     }
   }
 }
-// TODO Implement this library.

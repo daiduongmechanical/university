@@ -85,7 +85,7 @@ class MarkDetailPage extends StatelessWidget {
                     Expanded(
                       child: Container(
                         color: blurColor,
-                        padding: EdgeInsets.fromLTRB(MediaQuery.of(context).size.width * 0.2, 30, MediaQuery.of(context).size.width * 0.2, 0),
+                        padding: EdgeInsets.fromLTRB(MediaQuery.of(context).size.width * 0.15, 30, MediaQuery.of(context).size.width * 0.2, 0),
                         child: ListView.builder(
                           itemCount: listShow.length,
                           itemBuilder: (BuildContext context, int index) {
@@ -133,19 +133,19 @@ class MarkDetailPage extends StatelessWidget {
                                 DataRow(
                                   cells: <DataCell>[
                                     DataCell(Text('Normal mark')),
-                                    DataCell(Text(data.normalMark == 0.0 ? "" : "${data.normalMark}")),
+                                    DataCell(Text(data.normalMark == 0.0 ? "waiting" : "${data.normalMark}")),
                                   ],
                                 ),
                                 DataRow(
                                   cells: <DataCell>[
                                     DataCell(Text('Middle mark')),
-                                    DataCell(Text(data.normalMark == 0.0 ? "" : "${data.middleMark}")),
+                                    DataCell(Text(data.normalMark == 0.0 ? "waiting" : "${data.middleMark}")),
                                   ],
                                 ),
                                 DataRow(
                                   cells: <DataCell>[
                                     DataCell(Text('Final mark')),
-                                    DataCell(Text(data.normalMark == 0.0 ? "" : "${data.fiinalMark}")),
+                                    DataCell(Text(data.normalMark == 0.0 ? "waiting" : "${data.fiinalMark}")),
                                   ],
                                 ),
                                 DataRow(
@@ -155,7 +155,7 @@ class MarkDetailPage extends StatelessWidget {
                                       style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                                     )),
                                     DataCell(Text(
-                                      data.normalMark == 0.0 ? "" : "${data.markTotal!.finalMark}",
+                                      data.normalMark == 0.0 ? "waiting" : "${data.markTotal!.finalMark}",
                                       style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: showColor(data.markTotal!.finalMark!)),
                                     )),
                                   ],

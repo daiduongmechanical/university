@@ -84,20 +84,7 @@ class _loginPageState extends State<LoginPage> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Row(
-                      children: [
-                        Checkbox(
-                          checkColor: Colors.white,
-                          value: checked,
-                          onChanged: (bool? value) {
-                            setState(() {
-                              checked = !checked;
-                            });
-                          },
-                        ),
-                        Text("Remember"),
-                      ],
-                    ),
+             SizedBox(),
                     Padding(
                       padding: const EdgeInsets.only(right: 20),
                       child: TextButton(
